@@ -17,12 +17,12 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlGetSchemaName(SEXP epaDoc) {
-  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(epaDoc);
+  xmlDocPtr doc = (xmlDocPtr)R_ExternalPtrAddr(epaDoc);
 
   xmlXPathContextPtr context = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr schemaRef_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='schemaRef']", context);
+  xmlXPathObjectPtr schemaRef_res = xmlXPathEvalExpression(
+      (xmlChar *)"//*[local-name()='schemaRef']", context);
   xmlNodeSetPtr schemaRef_nodeset = schemaRef_res->nodesetval;
   xmlXPathFreeContext(context);
 
@@ -30,12 +30,12 @@ RcppExport SEXP xbrlGetSchemaName(SEXP epaDoc) {
 
   CharacterVector href(schemaRef_nodeset_ln);
 
-  for (int i=0; i < schemaRef_nodeset_ln; i++) {
+  for (int i = 0; i < schemaRef_nodeset_ln; i++) {
     xmlNodePtr schemaRef_node = schemaRef_nodeset->nodeTab[i];
 
     xmlChar *tmp_str;
-    if ((tmp_str = xmlGetProp(schemaRef_node, (xmlChar*) "href"))) { 
-      href[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(schemaRef_node, (xmlChar *)"href"))) {
+      href[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       href[i] = NA_STRING;

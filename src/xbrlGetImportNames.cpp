@@ -17,12 +17,12 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlGetImportNames(SEXP epaDoc) {
-  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(epaDoc);
+  xmlDocPtr doc = (xmlDocPtr)R_ExternalPtrAddr(epaDoc);
 
   xmlXPathContextPtr context = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr import_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='import']", context);
+  xmlXPathObjectPtr import_res =
+      xmlXPathEvalExpression((xmlChar *)"//*[local-name()='import']", context);
   xmlNodeSetPtr import_nodeset = import_res->nodesetval;
   xmlXPathFreeContext(context);
 
@@ -30,12 +30,12 @@ RcppExport SEXP xbrlGetImportNames(SEXP epaDoc) {
 
   CharacterVector schemaLocation(import_nodeset_ln);
 
-  for (int i=0; i < import_nodeset_ln; i++) {
+  for (int i = 0; i < import_nodeset_ln; i++) {
     xmlNodePtr import_node = import_nodeset->nodeTab[i];
 
     xmlChar *tmp_str;
-    if ((tmp_str = xmlGetProp(import_node, (xmlChar*) "schemaLocation"))) { 
-      schemaLocation[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(import_node, (xmlChar *)"schemaLocation"))) {
+      schemaLocation[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       schemaLocation[i] = NA_STRING;

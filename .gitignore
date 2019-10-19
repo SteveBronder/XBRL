@@ -1,0 +1,8 @@
+*.Rproj
+configure.status
+.R*
+config.log
+config.status
+src/*.o
+src/*.so
+src/Makevars
