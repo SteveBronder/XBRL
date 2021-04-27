@@ -17,11 +17,11 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlParse(SEXP fileS) {
   CharacterVector file(fileS);
   xmlDocPtr doc;
-  if ((doc = xmlParseFile(file[0])))
+  if ((doc = xmlReadFile(file[0], NULL, XML_PARSE_HUGE)))
     return R_MakeExternalPtr(doc, R_NilValue, R_NilValue);
+  xmlFreeDoc(doc);
   return R_NilValue;
 }

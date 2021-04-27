@@ -17,12 +17,12 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlGetLinkbaseNames(SEXP epaDoc) {
-  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(epaDoc);
+  xmlDocPtr doc = (xmlDocPtr)R_ExternalPtrAddr(epaDoc);
 
   xmlXPathContextPtr context = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr linkbaseRef_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='linkbaseRef']", context);
+  xmlXPathObjectPtr linkbaseRef_res = xmlXPathEvalExpression(
+      (xmlChar *)"//*[local-name()='linkbaseRef']", context);
   xmlNodeSetPtr linkbaseRef_nodeset = linkbaseRef_res->nodesetval;
   xmlXPathFreeContext(context);
 
@@ -30,12 +30,12 @@ RcppExport SEXP xbrlGetLinkbaseNames(SEXP epaDoc) {
 
   CharacterVector href(linkbaseRef_nodeset_ln);
 
-  for (int i=0; i < linkbaseRef_nodeset_ln; i++) {
+  for (int i = 0; i < linkbaseRef_nodeset_ln; i++) {
     xmlNodePtr linkbaseRef_node = linkbaseRef_nodeset->nodeTab[i];
 
     xmlChar *tmp_str;
-    if ((tmp_str = xmlGetProp(linkbaseRef_node, (xmlChar*) "href"))) { 
-      href[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(linkbaseRef_node, (xmlChar *)"href"))) {
+      href[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       href[i] = NA_STRING;

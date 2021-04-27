@@ -56,7 +56,7 @@ XBRL <- function() {
   
   fileFromCache <- function(file) {
     if (!(gsub("^(http|https|ftp)://.*$", "\\1", file) %in% c("http", "https", "ftp"))) {
-      return (file)
+      return(file)
     }
     bname <- basename(file)
     cached.file <- paste0(cache.dir, "/", bname)
@@ -64,10 +64,13 @@ XBRL <- function() {
       if (verbose) {
         cat("Downloading to cache dir...")
       }
-
+      double_link_check = gregexpr('https', file)
+      if (length(double_link_check[[1]]) > 1) {
+        file = substr(file, double_link_check[[1]][2], nchar(file))
+      }
       status <- try(download.file(file, cached.file, quiet = !verbose),
-                    silent=TRUE)
-
+        silent = TRUE)
+      
       if (class(status)[1] == "try-error" || status == 1) {
         unlink(cached.file)
         stop(status, "\n")

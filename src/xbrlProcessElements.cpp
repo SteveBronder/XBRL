@@ -17,17 +17,19 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlProcessElements(SEXP epaDoc) {
-  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(epaDoc);
+  xmlDocPtr doc = (xmlDocPtr)R_ExternalPtrAddr(epaDoc);
 
   xmlXPathContextPtr context = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr schema_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='schema']", context);
+  xmlXPathObjectPtr schema_res =
+      xmlXPathEvalExpression((xmlChar *)"//*[local-name()='schema']", context);
   xmlNodeSetPtr schema_nodeset = schema_res->nodesetval;
   xmlChar *ns_txt;
-  ns_txt = xmlGetProp(schema_nodeset->nodeTab[0], (xmlChar*) "targetNamespace");
+  ns_txt = xmlGetProp(schema_nodeset->nodeTab[0], (xmlChar *)"targetNamespace");
 
-  xmlXPathObjectPtr element_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='element'][@*[local-name()='periodType']]", context);
+  xmlXPathObjectPtr element_res = xmlXPathEvalExpression(
+      (xmlChar *)"//*[local-name()='element'][@*[local-name()='periodType']]",
+      context);
   xmlNodeSetPtr element_nodeset = element_res->nodesetval;
   xmlXPathFreeContext(context);
 
@@ -42,64 +44,62 @@ RcppExport SEXP xbrlProcessElements(SEXP epaDoc) {
   CharacterVector balance(element_nodeset_ln);
   CharacterVector ns(element_nodeset_ln);
 
-  for (int i=0; i < element_nodeset_ln; i++) {
+  for (int i = 0; i < element_nodeset_ln; i++) {
     xmlNodePtr element_node = element_nodeset->nodeTab[i];
 
     xmlChar *tmp_str;
-    if ((tmp_str = xmlGetProp(element_node, (xmlChar*) "id"))) { 
-      elementId[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(element_node, (xmlChar *)"id"))) {
+      elementId[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       elementId[i] = NA_STRING;
     }
-    if ((tmp_str = xmlGetProp(element_node, (xmlChar*) "type"))) { 
-      type[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(element_node, (xmlChar *)"type"))) {
+      type[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       type[i] = NA_STRING;
     }
-    if ((tmp_str = xmlGetProp(element_node, (xmlChar*) "substitutionGroup"))) { 
-      substitutionGroup[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(element_node, (xmlChar *)"substitutionGroup"))) {
+      substitutionGroup[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       substitutionGroup[i] = NA_STRING;
     }
-    if ((tmp_str = xmlGetProp(element_node, (xmlChar*) "periodType"))) { 
-      periodType[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(element_node, (xmlChar *)"periodType"))) {
+      periodType[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       periodType[i] = NA_STRING;
     }
-    if ((tmp_str = xmlGetProp(element_node, (xmlChar*) "abstract"))) { 
-      abstract[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(element_node, (xmlChar *)"abstract"))) {
+      abstract[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       abstract[i] = NA_STRING;
     }
-    if ((tmp_str = xmlGetProp(element_node, (xmlChar*) "nillable"))) { 
-      nillable[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(element_node, (xmlChar *)"nillable"))) {
+      nillable[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       nillable[i] = NA_STRING;
     }
-    if ((tmp_str = xmlGetProp(element_node, (xmlChar*) "balance"))) { 
-      balance[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(element_node, (xmlChar *)"balance"))) {
+      balance[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       balance[i] = NA_STRING;
     }
-    ns[i] = (char *) ns_txt;
+    ns[i] = (char *)ns_txt;
   }
   xmlFree(ns_txt);
   xmlXPathFreeObject(element_res);
   xmlXPathFreeObject(schema_res);
 
-  return DataFrame::create(Named("elementId")=elementId,
-			   Named("type")=type,
-			   Named("substitutionGroup")=substitutionGroup,
-			   Named("periodType")=periodType,
-			   Named("abstract")=abstract,
-			   Named("nillable")=nillable,
-			   Named("balance")=balance,
-			   Named("ns")=ns);
+  return DataFrame::create(Named("elementId") = elementId, Named("type") = type,
+                           Named("substitutionGroup") = substitutionGroup,
+                           Named("periodType") = periodType,
+                           Named("abstract") = abstract,
+                           Named("nillable") = nillable,
+                           Named("balance") = balance, Named("ns") = ns);
 }

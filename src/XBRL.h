@@ -18,8 +18,8 @@
 #ifndef _XBRL_XBRL_H
 #define _XBRL_XBRL_H
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include <Rcpp.h>
 

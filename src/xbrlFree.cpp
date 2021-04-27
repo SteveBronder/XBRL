@@ -17,9 +17,8 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlFree(SEXP epaDoc) {
-  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(epaDoc);
+  xmlDocPtr doc = (xmlDocPtr)R_ExternalPtrAddr(epaDoc);
   if (doc)
     xmlFreeDoc(doc);
   return R_NilValue;

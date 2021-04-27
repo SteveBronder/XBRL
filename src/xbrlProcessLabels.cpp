@@ -17,16 +17,18 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlProcessLabels(SEXP epaDoc) {
-  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(epaDoc);
+  xmlDocPtr doc = (xmlDocPtr)R_ExternalPtrAddr(epaDoc);
 
   xmlXPathContextPtr context = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr label_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='label']", context);
+  xmlXPathObjectPtr label_res =
+      xmlXPathEvalExpression((xmlChar *)"//*[local-name()='label']", context);
   xmlNodeSetPtr label_nodeset = label_res->nodesetval;
-  xmlXPathObjectPtr labelArc_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='labelArc']", context);
+  xmlXPathObjectPtr labelArc_res = xmlXPathEvalExpression(
+      (xmlChar *)"//*[local-name()='labelArc']", context);
   xmlNodeSetPtr labelArc_nodeset = labelArc_res->nodesetval;
-  xmlXPathObjectPtr loc_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='loc']", context);
+  xmlXPathObjectPtr loc_res =
+      xmlXPathEvalExpression((xmlChar *)"//*[local-name()='loc']", context);
   xmlNodeSetPtr loc_nodeset = loc_res->nodesetval;
   xmlXPathFreeContext(context);
 
@@ -38,63 +40,64 @@ RcppExport SEXP xbrlProcessLabels(SEXP epaDoc) {
   CharacterVector labelString(label_nodeset_ln);
   CharacterVector href(label_nodeset_ln);
 
-  for (int i=0; i < label_nodeset_ln; i++) {
+  for (int i = 0; i < label_nodeset_ln; i++) {
     xmlNodePtr label_node = label_nodeset->nodeTab[i];
-    xmlChar *label_label = xmlGetProp(label_node, (xmlChar*) "label");
-    for (int j=0; j < labelArc_nodeset->nodeNr; j++) {
+    xmlChar *label_label = xmlGetProp(label_node, (xmlChar *)"label");
+    for (int j = 0; j < labelArc_nodeset->nodeNr; j++) {
       xmlNodePtr labelArc_node = labelArc_nodeset->nodeTab[j];
-      xmlChar *labelArc_to = xmlGetProp(labelArc_node, (xmlChar*) "to");
+      xmlChar *labelArc_to = xmlGetProp(labelArc_node, (xmlChar *)"to");
 
       int nomatch = xmlStrcmp(labelArc_to, label_label);
       xmlFree(labelArc_to);
       if (nomatch)
-	continue;
-      xmlFree(label_label);  // There is a match. Not needed anymore.
+        continue;
+      xmlFree(label_label); // There is a match. Not needed anymore.
 
-      xmlChar *labelArc_from = xmlGetProp(labelArc_node, (xmlChar*) "from");
-      for (int k=0; k < loc_nodeset->nodeNr; k++) {
-	xmlNodePtr loc_node = loc_nodeset->nodeTab[k];
-	xmlChar *loc_label = xmlGetProp(loc_node, (xmlChar*) "label");
-				
-	int nomatch = xmlStrcmp(loc_label, labelArc_from);
-	xmlFree(loc_label);
-	if (nomatch)
-	  continue;
-	xmlFree(labelArc_from);  // There is a match. Not needed anymore.
-				
-	xmlChar *tmp_str;
-	if ((tmp_str = xmlGetProp(loc_node, (xmlChar*) "href"))) {
-	  href[i] = (char *) tmp_str;
-	  string str = (char *) tmp_str;
-	  xmlFree(tmp_str);
-	  size_t found = str.find("#");
-	  if (found != string::npos) {
-	    str.replace(0, found+1, "");
-	    elementId[i] = str;
-	  }
-	} else {
-	  href[i] = NA_STRING;
-	  elementId[i] = NA_STRING;
-	}
-	if ((tmp_str = xmlGetProp(label_node, (xmlChar*) "lang"))) {
-	  lang[i] = (char *) tmp_str;
-	  xmlFree(tmp_str);
-	} else {
-	  lang[i] = NA_STRING;
-	}
-	if ((tmp_str = xmlGetProp(label_node, (xmlChar*) "role"))) { 
-	  labelRole[i] = (char *) tmp_str;
-	  xmlFree(tmp_str);
-	} else {
-	  labelRole[i] = NA_STRING;
-	}
-	if ((tmp_str = xmlNodeListGetString(doc, label_node->xmlChildrenNode, 1))) {
-	  labelString[i] = (char *) tmp_str;
-	  xmlFree(tmp_str);
-	} else {
-	  labelString[i] = NA_STRING;
-	}
-	break;
+      xmlChar *labelArc_from = xmlGetProp(labelArc_node, (xmlChar *)"from");
+      for (int k = 0; k < loc_nodeset->nodeNr; k++) {
+        xmlNodePtr loc_node = loc_nodeset->nodeTab[k];
+        xmlChar *loc_label = xmlGetProp(loc_node, (xmlChar *)"label");
+
+        int nomatch = xmlStrcmp(loc_label, labelArc_from);
+        xmlFree(loc_label);
+        if (nomatch)
+          continue;
+        xmlFree(labelArc_from); // There is a match. Not needed anymore.
+
+        xmlChar *tmp_str;
+        if ((tmp_str = xmlGetProp(loc_node, (xmlChar *)"href"))) {
+          href[i] = (char *)tmp_str;
+          string str = (char *)tmp_str;
+          xmlFree(tmp_str);
+          size_t found = str.find("#");
+          if (found != string::npos) {
+            str.replace(0, found + 1, "");
+            elementId[i] = str;
+          }
+        } else {
+          href[i] = NA_STRING;
+          elementId[i] = NA_STRING;
+        }
+        if ((tmp_str = xmlGetProp(label_node, (xmlChar *)"lang"))) {
+          lang[i] = (char *)tmp_str;
+          xmlFree(tmp_str);
+        } else {
+          lang[i] = NA_STRING;
+        }
+        if ((tmp_str = xmlGetProp(label_node, (xmlChar *)"role"))) {
+          labelRole[i] = (char *)tmp_str;
+          xmlFree(tmp_str);
+        } else {
+          labelRole[i] = NA_STRING;
+        }
+        if ((tmp_str =
+                 xmlNodeListGetString(doc, label_node->xmlChildrenNode, 1))) {
+          labelString[i] = (char *)tmp_str;
+          xmlFree(tmp_str);
+        } else {
+          labelString[i] = NA_STRING;
+        }
+        break;
       }
       break;
     }
@@ -106,9 +109,8 @@ RcppExport SEXP xbrlProcessLabels(SEXP epaDoc) {
   if (label_nodeset_ln == 0)
     return R_NilValue;
 
-  return DataFrame::create(Named("elementId")=elementId,
-			   Named("lang")=lang,
-			   Named("labelRole")=labelRole,
-			   Named("labelString")=labelString,
-			   Named("href")=href);
+  return DataFrame::create(Named("elementId") = elementId, Named("lang") = lang,
+                           Named("labelRole") = labelRole,
+                           Named("labelString") = labelString,
+                           Named("href") = href);
 }

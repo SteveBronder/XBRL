@@ -17,12 +17,12 @@
 
 #include "XBRL.h"
 
-
 RcppExport SEXP xbrlProcessRoles(SEXP epaDoc) {
-  xmlDocPtr doc = (xmlDocPtr) R_ExternalPtrAddr(epaDoc);
+  xmlDocPtr doc = (xmlDocPtr)R_ExternalPtrAddr(epaDoc);
 
   xmlXPathContextPtr context = xmlXPathNewContext(doc);
-  xmlXPathObjectPtr roleType_res = xmlXPathEvalExpression((xmlChar*) "//*[local-name()='roleType']", context);
+  xmlXPathObjectPtr roleType_res = xmlXPathEvalExpression(
+      (xmlChar *)"//*[local-name()='roleType']", context);
   xmlNodeSetPtr roleType_nodeset = roleType_res->nodesetval;
   xmlXPathFreeContext(context);
 
@@ -34,35 +34,36 @@ RcppExport SEXP xbrlProcessRoles(SEXP epaDoc) {
   CharacterVector description(roleType_nodeset_ln);
   CharacterVector definition(roleType_nodeset_ln);
 
-  for (int i=0; i < roleType_nodeset_ln; i++) {
+  for (int i = 0; i < roleType_nodeset_ln; i++) {
     xmlNodePtr roleType_node = roleType_nodeset->nodeTab[i];
 
     xmlChar *tmp_str;
-    if ((tmp_str = xmlGetProp(roleType_node, (xmlChar*) "roleURI"))) { 
-      roleId[i] = (char *) tmp_str;
+    if ((tmp_str = xmlGetProp(roleType_node, (xmlChar *)"roleURI"))) {
+      roleId[i] = (char *)tmp_str;
       xmlFree(tmp_str);
     } else {
       roleId[i] = NA_STRING;
     }
     xmlNodePtr child_node = roleType_node->xmlChildrenNode;
     while (child_node) {
-      if (xmlStrcmp(child_node->name, (xmlChar*) "definition")) {
-	child_node = child_node->next;
-	continue;
+      if (xmlStrcmp(child_node->name, (xmlChar *)"definition")) {
+        child_node = child_node->next;
+        continue;
       }
-      if ((tmp_str = xmlNodeListGetString(doc, child_node->xmlChildrenNode, 1))) {
-	definition[i] = (char *) tmp_str;
-	string str = (char *) tmp_str;
-	xmlFree(tmp_str);
-	size_t found1 = str.find(" - ");
-	if (found1 != string::npos) {
-	  order[i] = str.substr(0, found1);
-	  size_t found2 = str.find(" - ", found1+3);
-	  if (found2 != string::npos) {
-	    type[i] = str.substr(found1+3, found2-found1-3);
-	    description[i] = str.substr(found2+3);
-	  }
-	}
+      if ((tmp_str =
+               xmlNodeListGetString(doc, child_node->xmlChildrenNode, 1))) {
+        definition[i] = (char *)tmp_str;
+        string str = (char *)tmp_str;
+        xmlFree(tmp_str);
+        size_t found1 = str.find(" - ");
+        if (found1 != string::npos) {
+          order[i] = str.substr(0, found1);
+          size_t found2 = str.find(" - ", found1 + 3);
+          if (found2 != string::npos) {
+            type[i] = str.substr(found1 + 3, found2 - found1 - 3);
+            description[i] = str.substr(found2 + 3);
+          }
+        }
       }
 
       break;
@@ -70,9 +71,7 @@ RcppExport SEXP xbrlProcessRoles(SEXP epaDoc) {
   }
   xmlXPathFreeObject(roleType_res);
 
-  return DataFrame::create(Named("roleId")=roleId,
-			   Named("order")=order,
-			   Named("type")=type,
-			   Named("description")=description,
-			   Named("definition")=definition);
+  return DataFrame::create(
+      Named("roleId") = roleId, Named("order") = order, Named("type") = type,
+      Named("description") = description, Named("definition") = definition);
 }
